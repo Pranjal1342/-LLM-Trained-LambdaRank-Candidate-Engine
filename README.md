@@ -1,6 +1,5 @@
 ---
 title: Intelligent Candidate Discovery Ranking System
-emoji: 🎯
 colorFrom: blue
 colorTo: indigo
 sdk: streamlit
