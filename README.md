@@ -1,5 +1,5 @@
 ---
-title: Intelligent Candidate Discovery Ranking System
+title: LLM-Trained LambdaRank Candidate Engine
 colorFrom: blue
 colorTo: indigo
 sdk: streamlit
@@ -9,9 +9,9 @@ python_version: "3.11"
 pinned: false
 ---
 
-# Redrob Hackathon: Intelligent Candidate Discovery and Ranking System
+# : LLM-Trained LambdaRank Candidate Engine
 
-**A production grade, deterministic ranking pipeline for the Redrob Intelligent Candidate Discovery and Ranking Challenge.**
+**A production grade, deterministic ranking pipeline for the LLM-Trained LambdaRank Candidate Engine.**
 
 Ranks 100,000 candidates against a structured Job Description in **4 seconds** on CPU, with zero external API calls during inference.
 
@@ -33,32 +33,42 @@ The pipeline is split into two phases. The offline phase has no time limit and p
 
 ```mermaid
  flowchart TD
-    %% Define classes with light pastel fills, complementary borders, and dark text for contrast
-    classDef data fill:#e0f2fe,stroke:#0284c7,stroke-width:1px,color:#0f172a;
-    classDef llm fill:#f3e8ff,stroke:#7e22ce,stroke-width:1px,color:#0f172a;
-    classDef offline fill:#ffedd5,stroke:#c2410c,stroke-width:1px,color:#0f172a;
-    classDef online fill:#dcfce7,stroke:#15803d,stroke-width:1px,color:#0f172a;
+    %% Styling Classes mapped to the custom palette
+    classDef data fill:#272B36,stroke:#B7B8BB,stroke-width:1px,color:#D7D7D6;
+    classDef llm fill:#595D66,stroke:#B7B8BB,stroke-width:1px,color:#D7D7D6;
+    classDef offline fill:#595D66,stroke:#B7B8BB,stroke-width:1px,color:#D7D7D6;
+    classDef online fill:#595D66,stroke:#B7B8BB,stroke-width:1px,color:#D7D7D6;
+    classDef fixed fill:#595D66,stroke:#D7D7D6,stroke-width:2px,color:#D7D7D6;
+    classDef pending fill:#272B36,stroke:#A08A81,stroke-width:2px,stroke-dasharray:5 5,color:#A08A81;
 
-    candidates_jsonl["candidates.jsonl<br/>(100,000 records)"]:::data
-    submission_csv["submission.csv<br/>(100 ranked candidates)"]:::data
+    candidates_jsonl["candidates.jsonl"]
 
-    subgraph offline_phase [OFFLINE PHASE]
+    subgraph offline_phase [OFFLINE PHASE — Unconstrained Execution]
+        direction TB
+        
         subgraph gemma3_annotation [GEMMA3 PAIRWISE ANNOTATION]
-            stratified_sample["Stratified Sample of<br/>500 Candidates"]:::llm
-            pairwise_comparisons["2,500 Pairwise Comparisons<br/>(Local Gemma3 LLM)"]:::llm
-            elo_ratings["Laplace-smoothed<br/>Elo Ratings"]:::llm
-            relevance_labels["Quartile Thresholding to<br/>Relevance Labels 0-3"]:::llm
+            direction TB
             
+            stratified_sample["Stratified Sample"]
+            pairwise_comparisons["Pairwise Comparisons"]
+            elo_ratings["Elo Ratings"]
+            relevance_labels["Relevance Labels"]
+
             stratified_sample --> pairwise_comparisons
             pairwise_comparisons --> elo_ratings
             elo_ratings --> relevance_labels
         end
-        
-        bm25_index_build["BM25 Index Build<br/>(NumPy CSR matrix)"]:::offline
-        static_feature_precompute["Static Feature Precompute<br/>(18 JD-independent features)"]:::offline
-        
-        lightgbm_training["LIGHTGBM TRAINING<br/>Objective: lambdarank<br/>early stop on NDCG@5"]:::offline
-        
+
+        mismatch_detector_fix["Title/Skill Context Guard (c6)"]
+        mismatch_detector_fix -.->|Fix before re-sampling| stratified_sample
+
+        relevance_labels --> boundary_validator
+        boundary_validator["Boundary Validator"]
+
+        bm25_index_build["BM25 Index Build"]
+        static_feature_precompute["Static Feature Precompute"]
+        lightgbm_training["LIGHTGBM TRAINING"]
+
         bm25_index_build --> precomputed_artifacts_box
         static_feature_precompute --> precomputed_artifacts_box
         relevance_labels --> lightgbm_training
@@ -67,24 +77,21 @@ The pipeline is split into two phases. The offline phase has no time limit and p
         
         lightgbm_training --> precomputed_artifacts_box
         
-        precomputed_artifacts_box["PRECOMPUTED ARTIFACTS<br/>lgbm_model.txt<br/>bm25_matrix.npz<br/>static_features.pkl"]:::data
+        precomputed_artifacts_box["PRECOMPUTED ARTIFACTS"]
     end
-    
-    subgraph online_ranking_phase [ONLINE RANKING PHASE]
-        stage_0["Stage 0: Load Precomputed Artifacts<br/>(BM25, LightGBM, static features)"]:::online
+
+    subgraph online_ranking_phase [ONLINE RANKING PHASE — CPU Only, ≤300s, Network None]
+        direction TB
         
-        stage_1["Stage 1: Dual-pass BM25 Retrieval<br/>Pass A: JD skills on skills array<br/>Pass B: production keywords on career descriptions<br/>Narrow to ~8,500 candidates"]:::online
-        
-        stage_2["Stage 2: Load Stage 1 Records<br/>(Byte-offset index, O(1))"]:::online
-        
-        stage_2b["Stage 2b: Feature Engineering<br/>(22 features, adversarial detection,<br/>consistency score)"]:::online
-        
-        stage_4["Stage 4: LightGBM Inference<br/>(final_score = raw_score * consistency_score)"]:::online
-        
-        stage_5["Stage 5: Reasoning Compiler<br/>(Deterministic grammar, 4 templates,<br/>priority concerns, numeric audit)"]:::online
-        
-        stage_6["Stage 6: Blocking Audits + CSV Write<br/>(Honeypot, diversity, monotonicity checks)"]:::online
-        
+        stage_0["Stage 0: Load Artifacts"]
+        stage_1["Stage 1: Dual-Pass BM25 Retrieval (0.03s–0.05s)"]
+        stage_2["Stage 2: O(1) Candidate Lookup (0.45s)"]
+        stage_2b["Stage 2b: Feature Engineering (0.37s–0.45s)"]
+        stage_4["Stage 4: LightGBM Inference (0.01s–0.02s)"]
+        stage_5["Stage 5: Reasoning Compiler (1.77s–1.93s)"]
+        stage_6["Stage 6: Blocking Audits + CSV Write (<0.01s)"]
+        submission_csv["Submission CSV"]
+
         stage_0 --> stage_1
         stage_1 --> stage_2
         stage_2 --> stage_2b
@@ -93,7 +100,7 @@ The pipeline is split into two phases. The offline phase has no time limit and p
         stage_5 --> stage_6
         stage_6 --> submission_csv
     end
-    
+
     candidates_jsonl --> offline_phase
     candidates_jsonl --> stage_1
 
@@ -101,11 +108,13 @@ The pipeline is split into two phases. The offline phase has no time limit and p
     precomputed_artifacts_box -.-> stage_2
     precomputed_artifacts_box -.-> stage_2b
     precomputed_artifacts_box -.-> stage_4
-    
-    %% Use transparent fills (none) so it inherits GitHub's native dark/light themes seamlessly
-    style offline_phase fill:none,stroke:#777,stroke-width:2px,stroke-dasharray: 5 5
-    style online_ranking_phase fill:none,stroke:#777,stroke-width:2px,stroke-dasharray: 5 5
-    style gemma3_annotation fill:none,stroke:#555,stroke-width:1px   
+
+    %% Style Boundaries using Divider Color (#595D66)
+    style offline_phase fill:none,stroke:#595D66,stroke-width:2px,stroke-dasharray:5 5
+    style online_ranking_phase fill:none,stroke:#595D66,stroke-width:2px,stroke-dasharray:5 5
+    style gemma3_annotation fill:none,stroke:#595D66,stroke-width:1px
+
+
 
 ```        
 ---
@@ -115,11 +124,11 @@ The pipeline is split into two phases. The offline phase has no time limit and p
 ### Docker (recommended, matches the Stage 3 reproduction environment exactly)
 
 ```bash
-docker build -t redrob-ranker .
+docker build -t -ranker .
 docker run --rm --network none \
   -v $(pwd)/candidates.jsonl:/app/candidates.jsonl \
   -v $(pwd)/out:/app/out \
-  redrob-ranker
+  -ranker
 ```
 
 Output: `./out/CTRL_COFFEE_REPEAT.csv`, 100 ranked candidates, validated and ready to submit.
