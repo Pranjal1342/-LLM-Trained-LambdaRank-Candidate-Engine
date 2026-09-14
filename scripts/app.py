@@ -268,7 +268,7 @@ def rank_candidates_inline(
 
 
 def main():
-    st.title("LLM-Trained Candidate Engine")
+    st.title("ReasonedRank")
     st.caption(
         "Candidate ranking: submission. "
         "Lite mode (≤10K candidates, ≤1GB RAM)."

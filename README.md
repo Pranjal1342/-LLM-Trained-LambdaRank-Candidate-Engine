@@ -1,5 +1,5 @@
 ---
-title: LLM-Trained LambdaRank Candidate Engine
+title: ReasonedRank
 colorFrom: blue
 colorTo: indigo
 sdk: streamlit
@@ -9,9 +9,9 @@ python_version: "3.11"
 pinned: false
 ---
 
-# : LLM-Trained LambdaRank Candidate Engine
+# : ReasonedRank
 
-**A production grade, deterministic ranking pipeline for the LLM-Trained LambdaRank Candidate Engine.**
+**A production grade, deterministic ranking pipeline for the ReasonedRank.**
 
 Ranks candidate datasets against a structured Job Description in **4 seconds** on CPU, with zero external API calls during inference.
 
