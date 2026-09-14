@@ -13,7 +13,7 @@ import streamlit as st
 from rank_bm25 import BM25Okapi
 
 st.set_page_config(
-    page_title="Candidate Ranker",
+    page_title="Candidate Engine",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -268,7 +268,7 @@ def rank_candidates_inline(
 
 
 def main():
-    st.title(" Candidate Ranker")
+    st.title("LLM-Trained Candidate Engine")
     st.caption(
         "Candidate ranking: submission. "
         "Lite mode (≤10K candidates, ≤1GB RAM)."
