@@ -175,7 +175,7 @@ def validate_submission(submission_path: str) -> bool:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Validate submission.csv against the Redrob spec checklist"
+        description="Validate submission.csv against the spec checklist"
     )
     parser.add_argument(
         "--submission",

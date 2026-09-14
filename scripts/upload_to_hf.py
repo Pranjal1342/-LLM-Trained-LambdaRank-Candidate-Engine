@@ -4,7 +4,7 @@ from huggingface_hub import upload_folder, create_repo
 
 def main():
     parser = argparse.ArgumentParser(description="Upload project to Hugging Face Hub cleanly without virtual environment files")
-    parser.add_argument("--repo", required=True, help="Hugging Face repo ID (e.g., LordofMonarchs/intelligent-candidate-ranking-system)")
+    parser.add_argument("--repo", required=True, help="Hugging Face repo ID (e.g., LordofMonarchs/llm-trained-lambdarank-candidate-engine)")
     parser.add_argument("--type", default="space", choices=["space", "model", "dataset"], help="Repository type")
     args = parser.parse_args()
 

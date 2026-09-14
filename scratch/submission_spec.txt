@@ -1,4 +1,4 @@
-Submission Specification — Redrob Hackathon v4
+Submission Specification — v4
 Read this carefully before submitting. Submissions that don't match this spec will be auto-rejected by the validator without scoring.
 1. What you're submitting
 A CSV file ranking the top 100 candidates from candidates.jsonl for the released job description.
@@ -133,10 +133,10 @@ Cannot reproduce within compute limits; honeypot rate >10% in top 100; missing o
 Reasoning quality (6 checks above). Methodology coherence. Git history authenticity (real iteration vs single dump). Code quality.
 Failed reasoning checks; flat git history with no iteration; codebase consists entirely of LLM API calls
 5. Defend-your-work interview
-Top X finalists: 30-minute video call with Redrob engineering. Walk through architecture, defend design choices, demonstrate familiarity with your own code.
+Top X finalists: 30-minute video call with engineering. Walk through architecture, defend design choices, demonstrate familiarity with your own code.
 Cannot explain architecture; contradicts submitted code; clearly didn't build it
 Note on AI tool usage: You are allowed to use AI tools (Claude, GPT-4, etc.) as part of your development workflow. We expect many participants will. The evaluation is designed so that AI-assisted submissions where the human did real engineering work will succeed, while submissions that are mostly LLM output with minimal human engineering will fail at Stages 3-5. The compute constraint, code repo check, and defend-your-work interview together filter for genuine engineering, not for absence of AI use.
-6. Common rejections (we see these every hackathon)
+6. Common rejections (we see these every )
 99 rows or 101 rows instead of exactly 100.
 Ranks starting at 0 instead of 1.
 Duplicate candidate_ids.
@@ -152,7 +152,7 @@ You can identify honeypots through careful profile inspection. We expect a good 
 8. Leaderboard policy
 The leaderboard is hidden during the competition. You will not see your score until final results are announced. We strongly recommend you validate your approach locally using methodology and reasoning, not by submitting many variations.
 9. Sample submission
-A sample submission CSV that matches this spec is included in your hackathon bundle as sample_submission.csv. It is not a high-quality ranking — it's only a format reference.
+A sample submission CSV that matches this spec is included in your bundle as sample_submission.csv. It is not a high-quality ranking — it's only a format reference.
 10. What you submit (full picture)
 Your submission consists of three parts, all required:
 10.1 The CSV file
@@ -198,12 +198,12 @@ A clear README.md with setup instructions and exact commands to reproduce your s
 The full source code that produced the CSV (no hidden steps, no manual edits)
 Any pre-computed artifacts your code depends on (embeddings, indexes, model weights), or a script that produces them
 A requirements.txt, pyproject.toml, or equivalent specifying all dependencies and versions
-A submission_metadata.yaml at the repo root mirroring your portal metadata (use the template provided in the hackathon bundle as submission_metadata_template.yaml)
+A submission_metadata.yaml at the repo root mirroring your portal metadata (use the template provided in the bundle as submission_metadata_template.yaml)
 For Stage 3 code reproduction, your README must indicate a single command that produces the submission CSV from the candidates file. For example:
 python rank.py --candidates ./candidates.jsonl --out ./submission.csv
 If your system requires pre-computation (e.g., generating embeddings), document this clearly — pre-computation may exceed the 5-minute window, but the ranking step that produces the CSV must complete within it.
 10.4 AI tools declaration — what it means
-The hackathon permits AI tool use. We've designed the evaluation pipeline so that AI-assisted submissions where the human did real engineering work will succeed, while AI-only submissions (paste-and-pray) will fail at Stage 3 (compute reproduction), Stage 4 (no real code repo), or Stage 5 (cannot defend the work).
+The permits AI tool use. We've designed the evaluation pipeline so that AI-assisted submissions where the human did real engineering work will succeed, while AI-only submissions (paste-and-pray) will fail at Stage 3 (compute reproduction), Stage 4 (no real code repo), or Stage 5 (cannot defend the work).
 The declaration is for transparency, not filtering. Be honest. If your interview answers contradict your declaration, that's a much stronger negative signal than the AI use itself.
 10.5 Sandbox / demo link requirement
 A sandbox is a hosted environment where organizers (and you) can verify your ranking system runs reproducibly. Acceptable sandbox platforms include:

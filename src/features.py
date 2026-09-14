@@ -373,11 +373,11 @@ def compute_param_b_availability(candidate: dict) -> float:
     Combined recruiter response rate and recency of last activity.
 
     Schema fields read:
-      - redrob_signals.recruiter_response_rate  (0–1)
-      - redrob_signals.last_active_date
-      - redrob_signals.open_to_work_flag
+      - platform_signals.recruiter_response_rate  (0–1)
+      - platform_signals.last_active_date
+      - platform_signals.open_to_work_flag
     """
-    signals = candidate.get("redrob_signals", {}) or {}
+    signals = candidate.get("platform_signals", {}) or {}
 
     rr = signals.get("recruiter_response_rate")
     if rr is None:
@@ -436,9 +436,9 @@ def compute_param_d_notice_exp(candidate: dict) -> float:
     exp(-max(0, days-30)/30) — continuous decay gradient.
 
     Schema fields read:
-      - redrob_signals.notice_period_days  (int, 0–180)
+      - platform_signals.notice_period_days  (int, 0–180)
     """
-    signals = candidate.get("redrob_signals", {}) or {}
+    signals = candidate.get("platform_signals", {}) or {}
     days = signals.get("notice_period_days")
     if days is None:
         return 1.0  
@@ -463,10 +463,10 @@ def compute_param_e_credibility(candidate: dict) -> float:
     Schema fields read:
       - skills[].name
       - skills[].proficiency
-      - redrob_signals.skill_assessment_scores  (dict skill_name -> score 0-100)
+      - platform_signals.skill_assessment_scores  (dict skill_name -> score 0-100)
     """
     skills = candidate.get("skills", []) or []
-    signals = candidate.get("redrob_signals", {}) or {}
+    signals = candidate.get("platform_signals", {}) or {}
     assessments = signals.get("skill_assessment_scores") or {}
 
     if not isinstance(assessments, dict):
@@ -558,9 +558,9 @@ def compute_param_h_github(candidate: dict) -> float:
     -1 means no GitHub linked → return 0.0.
 
     Schema fields read:
-      - redrob_signals.github_activity_score  (float, -1 to 100)
+      - platform_signals.github_activity_score  (float, -1 to 100)
     """
-    signals = candidate.get("redrob_signals", {}) or {}
+    signals = candidate.get("platform_signals", {}) or {}
     score = signals.get("github_activity_score")
     if score is None:
         return 0.0
@@ -933,10 +933,10 @@ def c2_signup_anomaly(candidate: dict) -> float:
     Flag if signup_date is chronologically AFTER last_active_date.
 
     Schema fields read:
-      - redrob_signals.signup_date
-      - redrob_signals.last_active_date
+      - platform_signals.signup_date
+      - platform_signals.last_active_date
     """
-    signals = candidate.get("redrob_signals", {}) or {}
+    signals = candidate.get("platform_signals", {}) or {}
     signup = _safe_date(signals.get("signup_date"))
     last_active = _safe_date(signals.get("last_active_date"))
 
@@ -955,10 +955,10 @@ def c3_salary_inversion(candidate: dict) -> float:
     Flag if expected_salary.min > max.
 
     Schema fields read:
-      - redrob_signals.expected_salary_range_inr_lpa.min
-      - redrob_signals.expected_salary_range_inr_lpa.max
+      - platform_signals.expected_salary_range_inr_lpa.min
+      - platform_signals.expected_salary_range_inr_lpa.max
     """
-    signals = candidate.get("redrob_signals", {}) or {}
+    signals = candidate.get("platform_signals", {}) or {}
     salary = signals.get("expected_salary_range_inr_lpa") or {}
 
     sal_min = salary.get("min")
@@ -987,10 +987,10 @@ def c4_assessment_contradiction(candidate: dict) -> float:
     Schema fields read:
       - skills[].name
       - skills[].proficiency
-      - redrob_signals.skill_assessment_scores  (dict)
+      - platform_signals.skill_assessment_scores  (dict)
     """
     skills = candidate.get("skills", []) or []
-    signals = candidate.get("redrob_signals", {}) or {}
+    signals = candidate.get("platform_signals", {}) or {}
     assessments = signals.get("skill_assessment_scores") or {}
 
     if not isinstance(assessments, dict):
@@ -1027,11 +1027,11 @@ def c5_engagement_mismatch(
     AND endorsements_received <= 4.
 
     Schema fields read:
-      - redrob_signals.connection_count
-      - redrob_signals.search_appearance_30d
-      - redrob_signals.endorsements_received
+      - platform_signals.connection_count
+      - platform_signals.search_appearance_30d
+      - platform_signals.endorsements_received
     """
-    signals = candidate.get("redrob_signals", {}) or {}
+    signals = candidate.get("platform_signals", {}) or {}
 
     connections = signals.get("connection_count") or 0
     appearances = signals.get("search_appearance_30d") or 0
@@ -1175,7 +1175,7 @@ if __name__ == "__main__":
                              "industry": "Technology", "company_size": "11-50",
                              "description": "Deployed production ranking pipeline."}],
         "skills": [{"name": "Python", "proficiency": "advanced", "endorsements": 10, "duration_months": 36}],
-        "redrob_signals": {
+        "platform_signals": {
             "signup_date": "2021-01-01", "last_active_date": "2025-12-01",
             "recruiter_response_rate": 0.8, "open_to_work_flag": True,
             "connection_count": 100, "search_appearance_30d": 50,
@@ -1199,19 +1199,19 @@ if __name__ == "__main__":
     print(f"\nc1 (timeline violation):   {c1_timeline_impossibility(v1)}")
 
     v2 = copy.deepcopy(base)
-    v2["redrob_signals"]["signup_date"] = "2099-01-01"
+    v2["platform_signals"]["signup_date"] = "2099-01-01"
     print(f"c2 (signup anomaly):       {c2_signup_anomaly(v2)}")
 
     v3 = copy.deepcopy(base)
-    v3["redrob_signals"]["expected_salary_range_inr_lpa"] = {"min": 50.0, "max": 10.0}
+    v3["platform_signals"]["expected_salary_range_inr_lpa"] = {"min": 50.0, "max": 10.0}
     print(f"c3 (salary inversion):     {c3_salary_inversion(v3)}")
 
     v4 = copy.deepcopy(base)
-    v4["redrob_signals"]["skill_assessment_scores"] = {"python": 12.0}
+    v4["platform_signals"]["skill_assessment_scores"] = {"python": 12.0}
     print(f"c4 (assessment contradiction): {c4_assessment_contradiction(v4)}")
 
     v5 = copy.deepcopy(base)
-    v5["redrob_signals"]["connection_count"] = 0
-    v5["redrob_signals"]["search_appearance_30d"] = 0
-    v5["redrob_signals"]["endorsements_received"] = 0
+    v5["platform_signals"]["connection_count"] = 0
+    v5["platform_signals"]["search_appearance_30d"] = 0
+    v5["platform_signals"]["endorsements_received"] = 0
     print(f"c5 (engagement mismatch):  {c5_engagement_mismatch(v5, bm25_score=10.0, median_bm25=5.0)}")

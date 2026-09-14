@@ -54,7 +54,7 @@ def run_step(command_list, step_label, step_num):
     return elapsed
 
 def main():
-    parser = argparse.ArgumentParser(description="Redrob Ranking Pipeline Runner")
+    parser = argparse.ArgumentParser(description="Ranking Pipeline Runner")
     parser.add_argument("--candidates", default="./candidates.jsonl", help="Path to candidates JSONL")
     parser.add_argument("--out", default="./CTRL_COFFEE_REPEAT.csv", help="Path to output CSV")
     parser.add_argument("--force-precompute", action="store_true", help="Force rebuild precompute artifacts")

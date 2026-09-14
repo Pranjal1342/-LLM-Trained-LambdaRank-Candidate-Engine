@@ -1,1 +1,1 @@
-# src package — Redrob ranking pipeline core modules
+# src package — ranking pipeline core modules

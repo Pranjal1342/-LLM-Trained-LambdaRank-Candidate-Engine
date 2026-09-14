@@ -13,7 +13,7 @@ import streamlit as st
 from rank_bm25 import BM25Okapi
 
 st.set_page_config(
-    page_title="Redrob Candidate Ranker",
+    page_title="Candidate Ranker",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -268,9 +268,9 @@ def rank_candidates_inline(
 
 
 def main():
-    st.title(" Redrob Candidate Ranker")
+    st.title(" Candidate Ranker")
     st.caption(
-        "Candidate ranking: Redrob hackathon submission. "
+        "Candidate ranking: submission. "
         "Lite mode (≤10K candidates, ≤1GB RAM)."
     )
 
@@ -440,7 +440,7 @@ def main():
         else:
             st.info(
                 " Upload a JSONL file of candidate records to rank them. "
-                "The file must match the Redrob candidate schema."
+                "The file must match the candidate schema."
             )
 # sample
             with st.expander("Expected JSONL format (one candidate per line)"):
@@ -495,13 +495,13 @@ def main():
             {"#": 1, "Feature": "bm25_score", "Source": "BM25 retrieval"},
             {"#": 2, "Feature": "yoe", "Source": "profile.years_of_experience"},
             {"#": 3, "Feature": "Param_A_Systems_Depth", "Source": "career_history[].description + duration_months"},
-            {"#": 4, "Feature": "Param_B_Availability", "Source": "redrob_signals.recruiter_response_rate + last_active_date"},
+            {"#": 4, "Feature": "Param_B_Availability", "Source": "platform_signals.recruiter_response_rate + last_active_date"},
             {"#": 5, "Feature": "Param_C_Tenure", "Source": "career_history[].duration_months"},
-            {"#": 6, "Feature": "Param_D_Notice_Exp", "Source": "redrob_signals.notice_period_days"},
+            {"#": 6, "Feature": "Param_D_Notice_Exp", "Source": "platform_signals.notice_period_days"},
             {"#": 7, "Feature": "Param_E_Credibility", "Source": "skills[].proficiency + skill_assessment_scores"},
             {"#": 8, "Feature": "Param_F_Consulting", "Source": "career_history[].industry + duration_months"},
             {"#": 9, "Feature": "Param_G_Location", "Source": "profile.location + country"},
-            {"#": 10, "Feature": "Param_H_GitHub", "Source": "redrob_signals.github_activity_score"},
+            {"#": 10, "Feature": "Param_H_GitHub", "Source": "platform_signals.github_activity_score"},
             {"#": 11, "Feature": "title_ai_fraction", "Source": "career_history[].title"},
             {"#": 12, "Feature": "prod_signal_log", "Source": "career_history[].description"},
             {"#": 13, "Feature": "consistency_score", "Source": "c1×c2×c3×c4×c5"},

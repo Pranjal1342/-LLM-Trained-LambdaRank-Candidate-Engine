@@ -74,7 +74,7 @@ def build_jd_summary(jd_config) -> str:
 def build_candidate_summary(candidate: dict) -> str:
     
     profile  = candidate.get("profile", {}) or {}
-    signals  = candidate.get("redrob_signals", {}) or {}
+    signals  = candidate.get("platform_signals", {}) or {}
 
     lines = []
     lines.append(f"ID: {candidate.get('candidate_id', 'unknown')}")

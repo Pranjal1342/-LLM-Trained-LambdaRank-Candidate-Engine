@@ -1,7 +1,7 @@
 """
 validate_pipeline.py
 
-Local validation protocol for the Redrob candidate ranking system.
+Local validation protocol for the candidate ranking system.
 Runs entirely offline, no network calls, designed to be executed
 before any of the 3 allowed competition submissions are spent.
 
@@ -108,28 +108,28 @@ def make_synthetic_honeypot(violation: str, base_candidate: dict) -> dict:
         c["skills"][0]["duration_months"] = int(c["profile"]["years_of_experience"] * 12) + 50
 
     elif violation == "signup_anomaly":
-        c["redrob_signals"]["signup_date"] = "2099-01-01"
-        c["redrob_signals"]["last_active_date"] = "2026-01-01"
+        c["platform_signals"]["signup_date"] = "2099-01-01"
+        c["platform_signals"]["last_active_date"] = "2026-01-01"
 
     elif violation == "salary_inversion":
-        c["redrob_signals"]["expected_salary_range_inr_lpa"] = {"min": 50.0, "max": 10.0}
+        c["platform_signals"]["expected_salary_range_inr_lpa"] = {"min": 50.0, "max": 10.0}
 
     elif violation == "assessment_contradiction":
         skill_name = c["skills"][0]["name"]
         c["skills"][0]["proficiency"] = "advanced"
-        c["redrob_signals"]["skill_assessment_scores"][skill_name] = 12.0
+        c["platform_signals"]["skill_assessment_scores"][skill_name] = 12.0
 
     elif violation == "engagement_mismatch":
-        c["redrob_signals"]["connection_count"] = 0
-        c["redrob_signals"]["search_appearance_30d"] = 0
-        c["redrob_signals"]["endorsements_received"] = 0
+        c["platform_signals"]["connection_count"] = 0
+        c["platform_signals"]["search_appearance_30d"] = 0
+        c["platform_signals"]["endorsements_received"] = 0
 
     elif violation == "langchain_dabbler":
         c["skills"] = [
             {"name": "LangChain", "proficiency": "advanced", "endorsements": 2, "duration_months": 6},
             {"name": "Prompt Engineering", "proficiency": "advanced", "endorsements": 1, "duration_months": 4},
         ]
-        c["redrob_signals"]["skill_assessment_scores"] = {}
+        c["platform_signals"]["skill_assessment_scores"] = {}
 
     elif violation == "cv_specialist_no_nlp":
         c["skills"] = [

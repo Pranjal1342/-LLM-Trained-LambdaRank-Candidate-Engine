@@ -515,7 +515,7 @@ def pipeline_fn(
     return [cid for cid, _ in ranked]
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Redrob Candidate Ranking Pipeline",
+        description="Candidate Ranking Pipeline",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
@@ -547,7 +547,7 @@ def main() -> None:
     wall_start = time.time()
 
     logger.info("=" * 60)
-    logger.info("REDROB RANKING PIPELINE")
+    logger.info("RANKING PIPELINE")
     logger.info("Candidates: %s", candidates_path)
     logger.info("Output: %s", out_path)
     logger.info("Base dir: %s", base_dir)

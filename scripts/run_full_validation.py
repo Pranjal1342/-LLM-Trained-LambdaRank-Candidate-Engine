@@ -93,16 +93,16 @@ def main():
     
     # test case: just inside the threshold (connections=60, appearances=15, endorsements=4)
     inside_c = copy.deepcopy(r1_cand)
-    inside_c["redrob_signals"]["connection_count"] = 60
-    inside_c["redrob_signals"]["search_appearance_30d"] = 15
-    inside_c["redrob_signals"]["endorsements_received"] = 4
+    inside_c["platform_signals"]["connection_count"] = 60
+    inside_c["platform_signals"]["search_appearance_30d"] = 15
+    inside_c["platform_signals"]["endorsements_received"] = 4
     c5_inside = c5_engagement_mismatch(inside_c, bm25_score=60.0, median_bm25=50.0)
     
     # test case: just outside the threshold (connections=61, appearances=15, endorsements=4)
     outside_c = copy.deepcopy(r1_cand)
-    outside_c["redrob_signals"]["connection_count"] = 61
-    outside_c["redrob_signals"]["search_appearance_30d"] = 15
-    outside_c["redrob_signals"]["endorsements_received"] = 4
+    outside_c["platform_signals"]["connection_count"] = 61
+    outside_c["platform_signals"]["search_appearance_30d"] = 15
+    outside_c["platform_signals"]["endorsements_received"] = 4
     c5_outside = c5_engagement_mismatch(outside_c, bm25_score=60.0, median_bm25=50.0)
     
     c5_pass = (c5_inside == 0.0) and (c5_outside == 1.0)

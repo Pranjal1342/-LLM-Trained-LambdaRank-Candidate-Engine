@@ -312,7 +312,7 @@ def _get_severity_ranked_concern(
     Evaluates in a strict order and returns the first matching concern.
     """
     # Priority 1  Notice period > 90 days
-    notice_days = candidate.get("redrob_signals", {}).get("notice_period_days")
+    notice_days = candidate.get("platform_signals", {}).get("notice_period_days")
     if notice_days is not None:
         try:
             notice_days_int = int(float(notice_days))
@@ -325,7 +325,7 @@ def _get_severity_ranked_concern(
     location = profile.get("location") or "unknown location"
     country = profile.get("country") or "unknown country"
     is_india = country.lower().strip() in ["india", "in"]
-    willing_to_relocate = bool(candidate.get("redrob_signals", {}).get("willing_to_relocate", False))
+    willing_to_relocate = bool(candidate.get("platform_signals", {}).get("willing_to_relocate", False))
 
     # Priority 2: Outside India and unwilling to relocate
     if not is_india and not willing_to_relocate:
@@ -354,7 +354,7 @@ def _get_severity_ranked_concern(
         return "Job title and role descriptions show significant domain mismatch across career history — verify directly with candidate"
 
     # Priority 8: Skill assessment score < 50
-    assessments = candidate.get("redrob_signals", {}).get("skill_assessment_scores") or {}
+    assessments = candidate.get("platform_signals", {}).get("skill_assessment_scores") or {}
     if isinstance(assessments, dict):
         assessed_keys = {k.lower().strip(): (k, v) for k, v in assessments.items()}
         for s in candidate.get("skills", []) or []:
@@ -428,7 +428,7 @@ class ReasoningCompiler:
         location = candidate.get("profile", {}).get("location") or "unknown location"
         concern = _get_severity_ranked_concern(feature_vector, candidate)
         _profile = candidate.get("profile") or {}
-        _signals = candidate.get("redrob_signals") or {}
+        _signals = candidate.get("platform_signals") or {}
 
         yoe_raw = _profile.get("years_of_experience")
         yoe_str = "0"
@@ -631,7 +631,7 @@ if __name__ == "__main__":
                 "description": "Deployed BM25 and FAISS ranking pipeline at production scale with low latency."
             }],
             "skills": skills,
-            "redrob_signals": {
+            "platform_signals": {
                 "signup_date": "2021-01-01", "last_active_date": "2025-12-01",
                 "recruiter_response_rate": 0.8, "open_to_work_flag": True,
                 "connection_count": 200, "search_appearance_30d": 80,
