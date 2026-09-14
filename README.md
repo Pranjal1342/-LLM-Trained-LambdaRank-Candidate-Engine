@@ -130,10 +130,10 @@ source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
 # 3. Run precomputation (one-time, roughly 7 minutes on candidate datasets)
-python scripts/precompute.py --candidates ./candidates.jsonl --base-dir .
+python scripts/precompute.py --candidates ./synthetic_candidates.jsonl --base-dir .
 
 # 4. Run ranking (roughly 4 seconds)
-python src/rank.py --candidates ./candidates.jsonl --out ./ranked_candidates.csv
+python src/rank.py --candidates ./synthetic_candidates.jsonl --out ./ranked_candidates.csv
 
 # 5. Validate output format
 python scripts/validate_submission.py --submission ./ranked_candidates.csv
@@ -142,7 +142,7 @@ python scripts/validate_submission.py --submission ./ranked_candidates.csv
 **Single-command alternative** (handles artifact caching automatically):
 
 ```bash
-python scripts/run_full_pipeline.py --candidates ./candidates.jsonl --out ./ranked_candidates.csv
+python scripts/run_full_pipeline.py --candidates ./synthetic_candidates.jsonl --out ./ranked_candidates.csv
 ```
 
 Add `--force-precompute` to bypass the cache and rebuild all artifacts from scratch.

@@ -48,3 +48,5 @@ diagnostics/
 # Temp files created during validation runs
 _tmp_*.jsonl
 _tmp_*.csv
+
+synthetic_candidates.jsonl
