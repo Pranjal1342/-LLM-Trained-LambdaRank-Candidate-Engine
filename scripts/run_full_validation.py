@@ -24,7 +24,7 @@ def main():
     candidates_path = os.path.join(_PROJECT_ROOT, "candidates.jsonl")
     aliases_path = os.path.join(_PROJECT_ROOT, "data", "skill_aliases.json")
     precomputed_dir = os.path.join(_PROJECT_ROOT, "precomputed")
-    submission_path = os.path.join(_PROJECT_ROOT, "CTRL_COFFEE_REPEAT.csv") if os.path.exists(os.path.join(_PROJECT_ROOT, "CTRL_COFFEE_REPEAT.csv")) else os.path.join(_PROJECT_ROOT, "submission.csv")
+    submission_path = os.path.join(_PROJECT_ROOT, "ranked_candidates.csv") if os.path.exists(os.path.join(_PROJECT_ROOT, "ranked_candidates.csv")) else os.path.join(_PROJECT_ROOT, "submission.csv")
 
     print("Loading validation configurations and index...")
     jd_config = parse_jd(aliases_path)

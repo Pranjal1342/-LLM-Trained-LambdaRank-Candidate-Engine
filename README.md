@@ -13,9 +13,9 @@ pinned: false
 
 **A production grade, deterministic ranking pipeline for the LLM-Trained LambdaRank Candidate Engine.**
 
-Ranks 100,000 candidates against a structured Job Description in **4 seconds** on CPU, with zero external API calls during inference.
+Ranks candidate datasets against a structured Job Description in **4 seconds** on CPU, with zero external API calls during inference.
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white) ![Runtime](https://img.shields.io/badge/Runtime-4.00s%20%2F%20100K-blue) ![Network](https://img.shields.io/badge/Network-Zero%20Calls-green) ![Model](https://img.shields.io/badge/Ranker-LightGBM%20LambdaRank-orange) ![Labels](https://img.shields.io/badge/Labels-Gemma3%20Pairwise%20(Local)-purple) ![License](https://img.shields.io/badge/License-MIT-yellow)
+![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white) ![Runtime](https://img.shields.io/badge/Runtime-4.00s%20%2F%20candidate datasets-blue) ![Network](https://img.shields.io/badge/Network-Zero%20Calls-green) ![Model](https://img.shields.io/badge/Ranker-LightGBM%20LambdaRank-orange) ![Labels](https://img.shields.io/badge/Labels-Gemma3%20Pairwise%20(Local)-purple) ![License](https://img.shields.io/badge/License-MIT-yellow)
 
 [Architecture](#architecture) · [Quick Start](#quick-start) · [Runtime Performance](#runtime-performance) · [Pipeline Internals](#pipeline-internals) · [Model Comparison](#model-comparison-heuristic-vs-gemma-trained) · [Validation](#validation) · [Constraints](#runtime-constraints-all-enforced) · [File Structure](#file-structure)
 
@@ -131,7 +131,7 @@ docker run --rm --network none \
   -ranker
 ```
 
-Output: `./out/CTRL_COFFEE_REPEAT.csv`, 100 ranked candidates, validated and ready to submit.
+Output: `./out/ranked_candidates.csv`, 100 ranked candidates, validated and ready to submit.
 
 ### Without Docker
 
@@ -143,20 +143,20 @@ source .venv/bin/activate        # Windows: .venv\Scripts\activate
 # 2. Install pinned dependencies
 pip install -r requirements.txt
 
-# 3. Run precomputation (one-time, roughly 7 minutes on 100K candidates)
+# 3. Run precomputation (one-time, roughly 7 minutes on candidate datasets)
 python scripts/precompute.py --candidates ./candidates.jsonl --base-dir .
 
 # 4. Run ranking (roughly 4 seconds)
-python src/rank.py --candidates ./candidates.jsonl --out ./CTRL_COFFEE_REPEAT.csv
+python src/rank.py --candidates ./candidates.jsonl --out ./ranked_candidates.csv
 
 # 5. Validate output format
-python scripts/validate_submission.py --submission ./CTRL_COFFEE_REPEAT.csv
+python scripts/validate_submission.py --submission ./ranked_candidates.csv
 ```
 
 **Single-command alternative** (handles artifact caching automatically):
 
 ```bash
-python scripts/run_full_pipeline.py --candidates ./candidates.jsonl --out ./CTRL_COFFEE_REPEAT.csv
+python scripts/run_full_pipeline.py --candidates ./candidates.jsonl --out ./ranked_candidates.csv
 ```
 
 Add `--force-precompute` to bypass the cache and rebuild all artifacts from scratch.
@@ -409,7 +409,7 @@ assert max_signature_concentration <= 0.25
 
 ## Streamlit Sandbox (Section 10.5 Compliance)
 
-The sandbox runs in lite mode: it accepts a JSONL upload of up to 10,000 candidates, scores uploaded candidates against the real precomputed 100K-corpus BM25 index (falling back to a small inline index only for candidates not present in that corpus), runs the full ranking pipeline, and returns a downloadable `submission.csv`. Peak RAM stays well under 1 GB.
+The sandbox runs in lite mode: it accepts a JSONL upload of up to 10,000 candidates, scores uploaded candidates against the real precomputed full-corpus BM25 index (falling back to a small inline index only for candidates not present in that corpus), runs the full ranking pipeline, and returns a downloadable `submission.csv`. Peak RAM stays well under 1 GB.
 
 On small uploaded batches, the trained model places very low weight on `bm25_score` relative to JD-fit features (a direct consequence of training on Gemma labels, which never see retrieval scores), so multiple candidates can legitimately receive identical model scores. When this happens, the sandbox display applies a transparent, display-only secondary sort by `hard_req_coverage` and `bm25_score` so the ranking order remains legible; the underlying score values and the production `rank.py` pipeline are unaffected.
 
@@ -424,7 +424,7 @@ streamlit run scripts/app.py
 ## Troubleshooting
 
 **`precompute.py` raises a memory error**
-Ensure at least 16 GB RAM is available. The full 100K JSONL requires approximately 4 to 6 GB peak during BM25 index construction.
+Ensure at least 16 GB RAM is available. The full candidate dataset requires approximately 4 to 6 GB peak during BM25 index construction.
 
 **`rank.py` fails the diversity audit (exit code 3)**
 Not encountered during testing; every run, including the most recent full pipeline run after the Streamlit sandbox fixes, produced 93 distinct archetype signatures with max employer concentration of 14 percent and max signature concentration of 3 percent, both comfortably under the 30/25 percent thresholds. This entry documents the expected resolution path if a future model retrain or feature change causes a regression: check LightGBM feature importances via `precomputed/lgbm_model.txt` and verify the training label distribution in `scripts/precompute.py` is balanced across all four quartiles.
@@ -450,6 +450,6 @@ Key milestones directed and verified by the human team at every stage:
 - Diagnosed and resolved the score compression issue via a normalization scope fix in output assembly.
 - Approved the Elo to quartile label conversion thresholds and the post-inference consistency multiplier.
 - Verified all Stage 4 and Stage 5 compliance criteria against actual pipeline output before submission.
-- Diagnosed and fixed the Streamlit sandbox's BM25 scoping bug, where an inline index built on small upload batches produced unreliable term statistics; the sandbox now queries the real 100K-corpus index directly.
+- Diagnosed and fixed the Streamlit sandbox's BM25 scoping bug, where an inline index built on small upload batches produced unreliable term statistics; the sandbox now queries the real full-corpus index directly.
 - Ran the heuristic-vs-Gemma model comparison reported above and verified its numbers directly against pipeline output before including them in this document.
 Done

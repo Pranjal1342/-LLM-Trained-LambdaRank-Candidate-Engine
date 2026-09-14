@@ -525,8 +525,8 @@ def main() -> None:
     )
     parser.add_argument(
         "--out",
-        default="./CTRL_COFFEE_REPEAT.csv",
-        help="Path for output CTRL_COFFEE_REPEAT.csv",
+        default="./ranked_candidates.csv",
+        help="Path for output ranked_candidates.csv",
     )
     parser.add_argument(
         "--base-dir",

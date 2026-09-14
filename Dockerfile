@@ -29,7 +29,7 @@ RUN mkdir -p /app/logs /app/out
 # Default candidates file location (override with -v mount)
 # The full candidates.jsonl is NOT baked into the image (487MB) — mount it.
 ENV CANDIDATES_PATH=/app/candidates.jsonl
-ENV OUT_PATH=/app/out/CTRL_COFFEE_REPEAT.csv
+ENV OUT_PATH=/app/out/ranked_candidates.csv
 ENV BASE_DIR=/app
 
 # Entrypoint script selects precompute, rank, or full pipeline
