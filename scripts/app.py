@@ -476,8 +476,8 @@ def main():
             | 2 | Feature Extraction (22 features) | 15–25s |
             | 4 | LightGBM LambdaRank Inference | 1–3s |
             | 5 | Reasoning Compilation + Audits | 1–2s |
-            | 6 | Monotonicity Assert + CSV Write | <1s |
-            | **Total** | **End-to-End** | **3.55s** |
+            | 6 | Monotonicity Assert + CSV Write | < 0.2s |
+            | **Total** | **End-to-End** | **~10.0s** |
             """)
 
         with col2:

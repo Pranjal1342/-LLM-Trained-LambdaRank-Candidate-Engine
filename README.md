@@ -15,7 +15,7 @@ pinned: false
 
 Ranks candidate datasets against a structured Job Description in **4 seconds** on CPU, with zero external API calls during inference.
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white) ![Runtime](https://img.shields.io/badge/Runtime-4.00s%20%2F%20candidate datasets-blue) ![Network](https://img.shields.io/badge/Network-Zero%20Calls-green) ![Model](https://img.shields.io/badge/Ranker-LightGBM%20LambdaRank-orange) ![Labels](https://img.shields.io/badge/Labels-Gemma3%20Pairwise%20(Local)-purple) ![License](https://img.shields.io/badge/License-MIT-yellow)
+![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white) ![Runtime](https://img.shields.io/badge/Runtime-~10.00s%20%2F%20candidate datasets-blue) ![Network](https://img.shields.io/badge/Network-Zero%20Calls-green) ![Model](https://img.shields.io/badge/Ranker-LightGBM%20LambdaRank-orange) ![Labels](https://img.shields.io/badge/Labels-Gemma3%20Pairwise%20(Local)-purple) ![License](https://img.shields.io/badge/License-MIT-yellow)
 
 [Architecture](#architecture) · [Quick Start](#quick-start) · [Runtime Performance](#runtime-performance) · [Pipeline Internals](#pipeline-internals) · [Model Comparison](#model-comparison-heuristic-vs-gemma-trained) · [Validation](#validation) · [Constraints](#runtime-constraints-all-enforced) · [File Structure](#file-structure)
 
@@ -84,11 +84,11 @@ The pipeline is split into two phases. The offline phase has no time limit and p
         direction TB
         
         stage_0["Stage 0: Load Artifacts"]
-        stage_1["Stage 1: Dual-Pass BM25 Retrieval (0.03s–0.05s)"]
-        stage_2["Stage 2: O(1) Candidate Lookup (0.45s)"]
-        stage_2b["Stage 2b: Feature Engineering (0.37s–0.45s)"]
-        stage_4["Stage 4: LightGBM Inference (0.01s–0.02s)"]
-        stage_5["Stage 5: Reasoning Compiler (1.77s–1.93s)"]
+        stage_1["Stage 1: Dual-Pass BM25 Retrieval (0.03s–0.20s)"]
+        stage_2["Stage 2: O(1) Candidate Lookup (0.50s)"]
+        stage_2b["Stage 2b: Feature Engineering (0.37s–0.50s)"]
+        stage_4["Stage 4: LightGBM Inference (0.01s–0.10s)"]
+        stage_5["Stage 5: Reasoning Compiler (1.77s–1.70s)"]
         stage_6["Stage 6: Blocking Audits + CSV Write (<0.01s)"]
         submission_csv["Submission CSV"]
 
@@ -155,14 +155,14 @@ Add `--force-precompute` to bypass the cache and rebuild all artifacts from scra
 |---|---|---|---|
 | Offline | `experiments/pairwise_llm_check/` | Gemma3 pairwise annotation (2,500 pairs, local Ollama) | ~45 min |
 | Offline | `scripts/precompute.py` | BM25 indexing, static feature precomputation, LightGBM training | ~7 min |
-| Stage 0 | `src/rank.py` | Load precomputed artifacts (BM25, LightGBM, static features) | 1.10s |
-| Stage 1 | `src/retrieval.py` | Dual-pass BM25 retrieval (top 5,000 + rare-term safety net) | 0.05s |
-| Stage 2 | `src/rank.py` | Load Stage 1 candidate records via byte-offset index | 0.45s |
-| Stage 2b | `src/features.py` | Live feature extraction (22-feature matrix) | 0.45s |
-| Stage 4 | `src/rank.py` | LightGBM LambdaRank inference, consistency multiplier | 0.02s |
-| Stage 5 | `src/reasoning.py` | Deterministic reasoning compiler (top 100) | 1.93s |
+| Stage 0 | `src/rank.py` | Load precomputed artifacts (BM25, LightGBM, static features) | 1.50s |
+| Stage 1 | `src/retrieval.py` | Dual-pass BM25 retrieval (top 5,000 + rare-term safety net) | 0.20s |
+| Stage 2 | `src/rank.py` | Load Stage 1 candidate records via byte-offset index | 0.50s |
+| Stage 2b | `src/features.py` | Live feature extraction (22-feature matrix) | 0.50s |
+| Stage 4 | `src/rank.py` | LightGBM LambdaRank inference, consistency multiplier | 0.10s |
+| Stage 5 | `src/reasoning.py` | Deterministic reasoning compiler (top 100) | 1.70s |
 | Stage 6 | `src/rank.py` | Monotonicity assertion, honeypot and diversity audits, CSV write | <0.01s |
-| **Total** | | **End-to-end wall-clock** | **4.00s** |
+| **Total** | | **End-to-end wall-clock** | **~10.00s** |
 
 The offline phases run once during development with no time or network restrictions. Only Stages 0 through 6 execute during the competition's 5-minute ranking window.
 
