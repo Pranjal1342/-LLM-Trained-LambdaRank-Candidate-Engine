@@ -121,20 +121,6 @@ The pipeline is split into two phases. The offline phase has no time limit and p
 
 ## Quick Start
 
-### Docker (recommended, matches the Stage 3 reproduction environment exactly)
-
-```bash
-docker build -t -ranker .
-docker run --rm --network none \
-  -v $(pwd)/candidates.jsonl:/app/candidates.jsonl \
-  -v $(pwd)/out:/app/out \
-  -ranker
-```
-
-Output: `./out/ranked_candidates.csv`, 100 ranked candidates, validated and ready to submit.
-
-### Without Docker
-
 ```bash
 # 1. Create and activate a virtualenv
 python -m venv .venv
@@ -352,7 +338,7 @@ assert max_signature_concentration <= 0.25
 |---|---|---|
 | Wall-clock | <= 300s | `assert elapsed < 300` plus `sys.exit(4)` if exceeded |
 | RAM | <= 16 GB | BM25 Stage 1 pool capped at 5,000 candidates |
-| Network | Zero | `--network none` Docker flag; no runtime import makes a network call |
+| Network | Zero | No runtime import makes a network call |
 | Disk | <= 5 GB | Total precomputed artifacts: ~216 MB |
 | Output rows | Exactly 100 | `assert len(df) == 100` before CSV write |
 | Score monotonicity | Non-increasing | `assert_monotonicity()` before CSV write |
@@ -432,8 +418,7 @@ Not encountered during testing; every run, including the most recent full pipeli
 **`rank.py` exits with code 2 (honeypot audit failed)**
 More than 10 candidates with `consistency_score < 0.25` reached the top-100. Verify that `consistency_score` is computed correctly in `src/features.py` and that the post-inference multiplier (`final_score = lgbm_score * consistency_score`) is active in `src/rank.py`.
 
-**Docker build fails on arm64 Mac**
-Use `--platform linux/amd64` if cross-building for a cloud runner. LightGBM provides native arm64 wheels for local builds.
+
 
 ---
 
